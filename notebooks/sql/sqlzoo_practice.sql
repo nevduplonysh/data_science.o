@@ -221,3 +221,110 @@ WHERE population >= ALL (
     WHERE x.continent = y.continent 
     AND x.name != y.name
 )
+
+---
+
+-- The JOIN operation, Q1
+SELECT matchid, player FROM goal
+WHERE teamid='GER'
+
+-- The JOIN operation, Q2
+SELECT id, stadium, team1, team2 FROM game
+WHERE id = 1012
+
+-- The JOIN operation, Q3
+SELECT player, teamid, stadium, mdate 
+FROM goal JOIN game ON(goal.matchid=game.id)
+WHERE teamid='GER'
+
+-- The JOIN operation, Q4
+SELECT team1, team2, player
+FROM goal JOIN game ON (goal.matchid=game.id)
+WHERE player LIKE "Mario%"
+
+-- The JOIN operation, Q5
+SELECT player, teamid, coach, gtime
+FROM goal JOIN eteam ON (goal.teamid=eteam.id)
+WHERE gtime<=10
+
+-- The JOIN operation, Q6
+SELECT mdatem teamname
+FROM game JOIN eteam ON (eteam.id=game.team1)
+WHERE coach='Fernando Santos'
+
+-- The JOIN operation, Q7
+SELECT player
+FROM game JOIN goal (goal.matchid=game.id)
+WHERE stadium='National Stadium, Warsaw'
+
+-- The JOIN operation, Q8
+SELECT DISTINCT player
+FROM goal JOIN game ON (game.id=goal.matchid)
+WHERE (teamid<>'GER' AND (team1='GER' OR team2='GER'))
+
+-- The JOIN operation, Q9
+SELECT teamname, COUNT(teamid)
+FROM eteam JOIN goal ON (eteam.id=goal.teamid)
+GROUP BY teamname
+
+-- The JOIN operation, Q10
+SELECT stadium, COUNT(*)
+FROM game JOIN goal ON (goal.matchid=game.id)
+GROUP BY stadium
+
+-- The JOIN operation, Q11
+SELECT matchid, mdate, COUNT(*)
+FROM game JOIN goal ON (goal.matchid=game.id)
+WHERE (team1='POL' OR team2='POL')
+GROUP BY matchid, mdate
+
+-- The JOIN operation, Q12
+SELECT matchid, mdate, COUNT(*)
+FROM game JOIN goal ON (goal.matchid=game.id)
+WHERE teamid='GER'
+GROUP BY matchid, mdate
+
+-- The JOIN operation, Q13
+SELECT mdate, matchid, 
+        team1, SUM(CASE WHEN teamid=team1 THEN 1 ELSE 0 END) score1
+        team2, SUM(CASE WHEN teamid=team2 THEN 1 ELSE 0 END) score2
+FROM game JOIN goal ON (game.id=goal.matchid)
+WHERE (team1='ENG' OE team2='ENG')
+GROUP BY mdate, matchid, team1, team2
+ORDER BY mdate, matchidm team1, team2
+
+---
+
+-- SUM and COUNT, Q1
+SELECT SUM(population)
+FROM world
+
+-- SUM and COUNT, Q2
+SELECT DISTINCT continent 
+FROM world
+
+-- SUM and COUNT, Q3
+SELECT SUM(gpd) FROM world
+WHERE continent='Africa'
+
+-- SUM and COUNT, Q4
+SELECT COUNT(name) FROM world
+WHERE area >= 1000000
+
+-- SUM and COUNT, Q5
+SELECT SUM(population) FROM world
+WHERE name in ('Estonia', 'Latvia', 'Lithuania') 
+
+-- SUM and COUNT, Q6
+SELECT continent, COUNT(name) FROM world
+GROUP BY continent
+
+-- SUM and COUNT, Q7
+SELECT continent, COUNT(name) FROM world
+GROUP BY continent
+HAVING population >= 10000000
+
+-- SUM and COUNT, Q8
+SELECT continent FROM world
+GROUP BY continent
+HAVING SUM(population) >= 100000000
