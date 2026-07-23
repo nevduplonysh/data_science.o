@@ -328,3 +328,129 @@ HAVING population >= 10000000
 SELECT continent FROM world
 GROUP BY continent
 HAVING SUM(population) >= 100000000
+
+---
+
+-- More JOIN operations, Q1
+SELECT id, title
+FROM movie
+WHERE yr = 1962 AND budget > 2000000
+
+-- More JOIN operations, Q2
+SELECT yr 
+FROM movie
+WHERE title LIKE 'Citizen Kane'
+
+-- More JOIN operations, Q3
+SELECT id, title, yr
+FROM movie
+WHERE title LIKE 'Star Trek%'
+ORDER BY yr
+
+-- More JOIN operations, Q4
+SELECT id
+FROM actor
+WHERE name = 'Glenn Close'
+
+-- More JOIN operations, Q5
+SELECT id 
+FROM movie
+WHERE yr = 1942 AND title = 'Casablanca'
+
+-- More JOIN operations, Q6
+SELECT actor.name 
+FROM actor JOIN casting ON actor.id=casting.actorid
+           JOIN movie ON casting.movieid=movie.id
+WHERE yr=1942 AND title='Casablanca'
+
+-- More JOIN operations, Q7
+SELECT actor.name
+FROM actor JOIN casting ON actor.id=casting.actorid
+           JOIN movie ON movie.id=casting.movieid
+WHERE title='Alien'
+
+-- More JOIN operations, Q8
+SELECT title
+FROM movie JOIN casting ON movie.id=casting.movieid
+           JOIN actor ON actor.id=casting.actorid
+WHERE name LIKE 'Harrison Ford'
+
+-- More JOIN operations, Q9
+SELECT title
+FROM movie JOIN casting ON casting.movieid=movie.id
+           JOIN actor ON actor.id=casting.actorid
+WHERE name='Harrison Ford' AND ord!=1
+
+-- More JOIN operations, Q10
+SELECT movie.title, actor.name
+FROM movie JOIN casting ON casting.movieid=movie.id
+           JOIN actor ON casting.actorid=actor.id
+WHERE yr=1962 AND ord=1
+
+-- More JOIN operations, Q11
+SELECT yr, COUNT(title)
+FROM movie JOIN casting ON casting.movieid=movie.id
+           JOIN actor ON casting.actorid=actor.id
+WHERE name='Rock Hudson'
+GROUP BY yr
+HAVING COUNT(title) > 2
+
+-- More JOIN operations, Q12
+SELECT movie.title, actor.name
+FROM movie JOIN casting ON casting.movieid=movie.id
+           JOIN actor ON casting.actorid=actor.id
+WHERE ord=1 AND movie.id IN 
+        -- (SELECT movie.id 
+         -- FROM movie JOIN casting ON casting.movieid=movie.id
+            --         JOIN actor ON casting.actorid=actor.id
+         -- WHERE name = 'Julie Andrews')
+         (SELECT movieid 
+          FROM casting 
+          WHERE actorid IN (
+            SELECT id FROM actor
+            WHERE name='JUlie Andrews'
+          ))
+
+SELECT jam.title, a.name
+    FROM casting AS jac
+    JOIN actor   AS jaa ON jac.actorid=jaa.id
+    JOIN movie   AS jam ON jac.actorid=jam.id
+    JOIN casting AS c   ON (jam.id=c.movieid AND c.ord=1)
+    JOIN actor   AS a   ON (c.actorid=a.id)
+WHERE a.name = 'Julie Andrews'
+
+SELECT DISTINCT jam.title, a.name
+    FROM casting AS jac
+    JOIN actor   jaa ON jac.actorid=jaa.id
+    JOIN movie   jam ON jac.movieid=jam.id
+    JOIN casting c   ON (jac.movieid=c.movieid AND c.ord=1)
+    JOIN actor   a   ON (c.actorid=a.id)
+WHERE jaa.name='Julie Andrews'
+
+-- More JOIN operations, Q13
+SELECT name
+FROM actor JOIN casting ON (actor.id=casting.actorid)
+GROUP BY name
+HAVING SUM(ord=1) >= 15
+
+-- More JOIN operations, Q14
+SELECT title, COUNT(actorid)
+FROM movie JOIN casting ON movie.id=casting.movieid
+WHERE yr = 1978
+GROUP BY title
+ORDER BY COUNT(actorid) DESC, title
+
+-- More JOIN operations, Q15
+SELECT name
+FROM actor JOIN casting ON actor.id=casting.actorid
+WHERE movieid in (SELECT movieid
+                  FROM actor JOIN casting ON actor.id=casting.actorid
+                  WHERE name='Art Garfunkel') 
+      AND name!='Art Garfunkel'
+
+SELECT aa.name
+FROM actor a 
+     JOIN casting c  ON a.id=c.actorid
+     JOIN casting cc ON c.movieid=cc.movieid
+     JOIN actor   aa ON cc.actorid=aa.id
+WHERE a.name = 'Art Garfunkel' AND aa.name != 'Art Garfunkel'
